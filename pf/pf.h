@@ -1,10 +1,11 @@
 #ifndef _pf_h_
 #define _pf_h_
 
-using namespace std;
-
+#include <cstdio>
+#include <cstdlib>
 typedef int RC;
 typedef unsigned PageNum;
+typedef long int OffSet;
 
 #define PF_PAGE_SIZE 4096
 
@@ -32,6 +33,7 @@ private:
 
 class PF_FileHandle
 {
+	friend class PF_Manager;
 public:
     PF_FileHandle();                                                    // Default constructor
     ~PF_FileHandle();                                                   // Destructor
@@ -40,6 +42,13 @@ public:
     RC WritePage(PageNum pageNum, const void *data);                    // Write a specific page
     RC AppendPage(const void *data);                                    // Append a specific page
     unsigned GetNumberOfPages();                                        // Get the number of pages in the file
- };
+
+protected:
+	RC AttachFILE (FILE * fp);											// Attach the opened FILE to handle
+	FILE* GetFILE ();													// Give the FILE to other handler
+private:
+	FILE	*_fp;	 													// FILE pointer 
+	OffSet	_file_size;
+};
  
 #endif

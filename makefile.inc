@@ -1,5 +1,5 @@
 ## For students: change this path to the root of your code
-CODEROOT = "/Users/jiajianfeng/workplace/code/github/DBMG-PRJ/FileSystem/codebase"
+CODEROOT = "/Users/jiajianfeng/workplace/code/github/DBMG-PRJ/"
 
 #CC = gcc
 CC = g++
