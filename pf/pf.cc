@@ -5,7 +5,7 @@
 		fprintf (stderr, "null value\n"); \
 		return -1;}}
 
-
+PF_Manager* PF_Manager::_pf_manager = NULL;
 
 PF_Manager* PF_Manager::Instance()
 {
@@ -14,7 +14,6 @@ PF_Manager* PF_Manager::Instance()
     
     return _pf_manager;    
 }
-
 
 PF_Manager::PF_Manager()
 {
@@ -67,7 +66,7 @@ RC PF_Manager::OpenFile(const char *fileName, PF_FileHandle &fileHandle)
 
 	FILE	*fp;					
 
-	fp	= fopen( fileName, "rb" );
+	fp	= fopen( fileName, "rb+" );
 	if ( fp == NULL ) {
 		perror ( "opening error ");
 		return -1;
@@ -134,7 +133,7 @@ RC PF_FileHandle::ReadPage(PageNum pageNum, void *data)
 
 	fseek( _fp, pageNum * PF_PAGE_SIZE, SEEK_SET);
 	if ( 1 != fread( data, PF_PAGE_SIZE, 1, _fp)){
-		fprintf (stderr, "read error, fread failed\n");
+		perror ( "read error, fread failed");
 		return -1;
 	}
     return 0;
@@ -153,7 +152,7 @@ RC PF_FileHandle::WritePage(PageNum pageNum, const void *data)
 
 	fseek( _fp, pageNum * PF_PAGE_SIZE, SEEK_SET);
 	if ( 1 != fwrite( data, PF_PAGE_SIZE, 1, _fp)){
-		fprintf (stderr, "write error, fwrite failed\n");
+		perror( "write error, fwrite failed");
 		return -1;
 	}
     return 0;
@@ -167,7 +166,7 @@ RC PF_FileHandle::AppendPage(const void *data)
 
 	fseek( _fp, 0, SEEK_END);
 	if ( 1 != fwrite( data, PF_PAGE_SIZE, 1, _fp)){
-		fprintf (stderr, "write error, fwrite failed\n");
+		perror ( "write error, fwrite failed");
 		return -1;
 	}
 	_file_size += PF_PAGE_SIZE;

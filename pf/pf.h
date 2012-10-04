@@ -16,7 +16,7 @@ class PF_Manager
 {
 public:
     static PF_Manager* Instance();                                      // Access to the _pf_manager instance
-        
+       
     RC CreateFile    (const char *fileName);                            // Create a new file
     RC DestroyFile   (const char *fileName);                            // Destroy a file
     RC OpenFile      (const char *fileName, PF_FileHandle &fileHandle); // Open a file
