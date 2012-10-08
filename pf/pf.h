@@ -5,7 +5,6 @@
 #include <cstdlib>
 typedef int RC;
 typedef unsigned PageNum;
-typedef long int OffSet;
 
 #define PF_PAGE_SIZE 4096
 
@@ -48,7 +47,7 @@ protected:
 	FILE* GetFILE ();													// Give the FILE to other handler
 private:
 	FILE	*_fp;	 													// FILE pointer 
-	OffSet	_file_size;
+	PageNum _total_pages;												// Total pages of _fp
 };
  
 #endif
