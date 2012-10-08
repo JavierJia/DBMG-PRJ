@@ -1,3 +1,4 @@
+#include <sys/stat.h>
 #include "pf.h"
 
 #define CHECK_NULL(pt)	{ \
@@ -19,27 +20,21 @@ PF_Manager::PF_Manager()
 {
 }
 
-
 PF_Manager::~PF_Manager()
 {
 }
-
     
 RC PF_Manager::CreateFile(const char *fileName)
 {
-	CHECK_NULL(fileName);
-
-	FILE	*fp;
-	fp	= fopen( fileName, "r" );
-	if ( fp != NULL ) {
+	struct stat buffer;
+	if ( stat( fileName, &buffer) == 0){
 		fprintf ( stderr, "file %s already existed\n",fileName);
-		fclose(fp);
 		return -1;
 	}
 
-	fp = fopen ( fileName, "wb");
+	FILE *fp = fopen ( fileName, "wb");
 	if ( fp == NULL ){
-		perror ( "creating error:\n");
+		perror ( "creating error");
 		return -1;
 	}
 	fclose( fp );
@@ -90,7 +85,7 @@ RC PF_Manager::CloseFile(PF_FileHandle &fileHandle)
 }
 
 
-PF_FileHandle::PF_FileHandle(): _fp(NULL), _file_size(0)
+PF_FileHandle::PF_FileHandle(): _fp(NULL), _total_pages(0)
 {
 }
  
@@ -110,13 +105,13 @@ RC PF_FileHandle::AttachFILE(FILE * fp){
 		perror( "attaching seek error");
 		return -1;
 	}
-	_file_size = ftell(fp);
-	if ( _file_size < 0){
+	long file_size = ftell(fp);
+	if ( file_size < 0){
 		perror( "attaching tell error");
-		_file_size = 0;
 		return -1;
 	}
 	_fp = fp;
+	_total_pages = file_size / PF_PAGE_SIZE;
 	rewind(_fp);
 	return 0;
 }
@@ -126,7 +121,7 @@ RC PF_FileHandle::ReadPage(PageNum pageNum, void *data)
 	CHECK_NULL(data);
 	CHECK_NULL(_fp);
 
-	if ( (pageNum) * PF_PAGE_SIZE > _file_size){
+	if ( pageNum >= _total_pages ) {
 		fprintf (stderr, "read error, out of bound\n");
 		return -1;
 	}
@@ -145,7 +140,7 @@ RC PF_FileHandle::WritePage(PageNum pageNum, const void *data)
 	CHECK_NULL (data);
 	CHECK_NULL (_fp);
 
-	if ( (pageNum) * PF_PAGE_SIZE > _file_size){
+	if ( pageNum >= _total_pages ){
 		fprintf (stderr, "write error, out of bound\n");
 		return -1;
 	}
@@ -155,6 +150,7 @@ RC PF_FileHandle::WritePage(PageNum pageNum, const void *data)
 		perror( "write error, fwrite failed");
 		return -1;
 	}
+	fflush(_fp);
     return 0;
 }
 
@@ -166,17 +162,18 @@ RC PF_FileHandle::AppendPage(const void *data)
 
 	fseek( _fp, 0, SEEK_END);
 	if ( 1 != fwrite( data, PF_PAGE_SIZE, 1, _fp)){
-		perror ( "write error, fwrite failed");
+		perror ( "append error, fwrite failed");
 		return -1;
 	}
-	_file_size += PF_PAGE_SIZE;
+	fflush(_fp);
+	_total_pages += 1;
     return 0;
 }
 
 
 unsigned PF_FileHandle::GetNumberOfPages()
 {
-    return (_file_size > 0 ? (unsigned) _file_size / PF_PAGE_SIZE: 0);
+	return _total_pages ;
 }
 
 
