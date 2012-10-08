@@ -32,7 +32,7 @@ private:
 
 class PF_FileHandle
 {
-	friend class PF_Manager;
+    friend class PF_Manager;
 public:
     PF_FileHandle();                                                    // Default constructor
     ~PF_FileHandle();                                                   // Destructor
@@ -43,11 +43,11 @@ public:
     unsigned GetNumberOfPages();                                        // Get the number of pages in the file
 
 protected:
-	RC AttachFILE (FILE * fp);											// Attach the opened FILE to handle
-	FILE* GetFILE ();													// Give the FILE to other handler
+    RC AttachFILE (FILE * fp);                                          // Attach the opened FILE to handle
+    FILE* GetFILE ();                                                   // Give the FILE to other handler
 private:
-	FILE	*_fp;	 													// FILE pointer 
-	PageNum _total_pages;												// Total pages of _fp
+    FILE    *_fp;                                                       // FILE pointer 
+    PageNum _total_pages;                                               // Total pages of _fp
 };
  
 #endif

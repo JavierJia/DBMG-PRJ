@@ -24,16 +24,16 @@
 using namespace util;
 
 int main (int argc, const char* argv[]){
-	Logger::Log(0, "test normal log\n");
-	char filename[256] = "test.io";
+    Logger::Log(0, "test normal log\n");
+    char filename[256] = "test.io";
 
-	if (argc > 1 && argv[1]){
-		memcpy(filename, argv[1], 256 );
-	}
-	if (FileExists( filename)){
-		Logger::Log(0, "%s exists\n", filename);
-	}else{
-		Logger::Warn(0, "%s not exists\n", filename);
-	}
-	return 0;
-}	/* end of main */
+    if (argc > 1 && argv[1]){
+        memcpy(filename, argv[1], 256 );
+    }
+    if (FileExists( filename)){
+        Logger::Log(0, "%s exists\n", filename);
+    }else{
+        Logger::Warn(0, "%s not exists\n", filename);
+    }
+    return 0;
+}    /* end of main */

@@ -22,15 +22,15 @@
 #include <sys/stat.h>
 
 namespace util{
-	
+    
 bool FileExists ( const char* fileName )        /* test if file exist */
 {
-	struct stat stFileInfo;
-	if ( stat(fileName, &stFileInfo)){
-		return false;
-	}
-	return true;
-}		/* -----  end of function FileExist  ----- */
+    struct stat stFileInfo;
+    if ( stat(fileName, &stFileInfo)){
+        return false;
+    }
+    return true;
+}        /* -----  end of function FileExist  ----- */
 
 
 };
