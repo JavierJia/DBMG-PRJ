@@ -7,17 +7,19 @@ all: libpf.a pftest
 libpf.a: libpf.a(pf.o)  # and possibly other .o files
 
 # c file dependencies
-pf.o: pf.h
+pf.o: pf.h 
 
 pftest.o: pf.h
 
 # binary dependencies
-pftest: pftest.o libpf.a $(CODEROOT)/pf/libpf.a
+pftest: pftest.o libpf.a $(CODEROOT)/pf/libpf.a $(CODEROOT)/util/libutil.a
 
 # dependencies to compile used libraries
-.PHONY: $(CODEROOT)/pf/libpf.a
+.PHONY: $(CODEROOT)/pf/libpf.a $(CODEROOT)/util/libutil.a
 $(CODEROOT)/pf/libpf.a:
 	$(MAKE) -C $(CODEROOT)/pf libpf.a
+$(CODEROOT)/util/libutil.a:
+	$(MAKE) -C $(CODEROOT)/util libutil.a
 
 .PHONY: clean
 clean:

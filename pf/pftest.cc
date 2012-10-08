@@ -8,6 +8,8 @@
 #include <ctime>
 
 #include "pf.h"
+#include "../util/Logger.h"
+#include "../util/IO.h"
 
 using namespace std;
 
@@ -213,7 +215,8 @@ int PF_FileHandle_Test_AppendPage(PF_Manager *pf){
     rc = pf->DestroyFile(fileName);
     assert(rc == success);
     
-    if(!FileExists(fileName))
+	//if(!FileExists(fileName))
+	if (!util::FileExists(fileName))
     {
         cout << "File " << fileName << " has been destroyed." << endl;
         cout << "Test Case 2 Passed!" << endl << endl;
