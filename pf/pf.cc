@@ -46,6 +46,11 @@ RC PF_Manager::CreateFile(const char *fileName)
 RC PF_Manager::DestroyFile(const char *fileName)
 {
 	CHECK_NULL(fileName);
+	struct stat buffer;
+	if ( stat( fileName, &buffer) != 0){
+		perror ("file may not exist");
+		return -1;
+	}
 
 	if ( remove ( fileName ) != 0){
 		perror ( "deleting error");
@@ -77,6 +82,7 @@ RC PF_Manager::CloseFile(PF_FileHandle &fileHandle)
 	FILE * fp = fileHandle.GetFILE();
 	
 	CHECK_NULL(fp);
+	fflush(fp);
 	if ( fclose(fp) == EOF){
 		perror( "closing error ");
 		return -1;
@@ -99,6 +105,10 @@ FILE* PF_FileHandle::GetFILE(){
 }
 
 RC PF_FileHandle::AttachFILE(FILE * fp){
+	if ( _fp){
+		fprintf(stderr, "file handle attaching error: filehandle already assigned");
+		return -1;
+	}
 	CHECK_NULL(fp);
 
 	if ( fseek( fp, 0, SEEK_END) ){
