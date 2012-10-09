@@ -1,18 +1,24 @@
 
 include ../makefile.inc
 
-all: libpf.a pftest
+all: libpf.a pftest my_pftest
 
 # lib file dependencies
-libpf.a: libpf.a(pf.o)  # and possibly other .o files
+libpf.a: libpf.a(pf.o pf_filenode.o)  # and possibly other .o files
 
 # c file dependencies
 pf.o: pf.h 
+
+pf_filenode: pf_filenode.h
 
 pftest.o: pf.h
 
 # binary dependencies
 pftest: pftest.o libpf.a $(CODEROOT)/pf/libpf.a $(CODEROOT)/util/libutil.a
+
+my_pftest.o: pf.h
+
+my_pftest: my_pftest.o libpf.a $(CODEROOT)/pf/libpf.a $(CODEROOT)/util/libutil.a
 
 # dependencies to compile used libraries
 .PHONY: $(CODEROOT)/pf/libpf.a $(CODEROOT)/util/libutil.a
@@ -23,4 +29,4 @@ $(CODEROOT)/util/libutil.a:
 
 .PHONY: clean
 clean:
-	-rm pftest *.a *.o *~
+	-rm my_pftest pftest *.a *.o *~ tags

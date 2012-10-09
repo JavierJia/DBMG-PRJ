@@ -1,5 +1,9 @@
 #include <sys/stat.h>
 #include "pf.h"
+#include "pf_filenode.h"
+#include "util/Logger.h"
+
+using namespace util;
 
 #define CHECK_NULL(pt)    { \
     if ( pt == NULL){    \
@@ -18,10 +22,15 @@ PF_Manager* PF_Manager::Instance()
 
 PF_Manager::PF_Manager()
 {
+    _pf_filelist = new PF_FileList();
 }
 
 PF_Manager::~PF_Manager()
 {
+    if (_pf_filelist){
+        delete _pf_filelist;
+        _pf_filelist = NULL;
+    }
 }
     
 RC PF_Manager::CreateFile(const char *fileName)
@@ -39,7 +48,10 @@ RC PF_Manager::CreateFile(const char *fileName)
     }
     fclose( fp );
 
-    return 0;
+    // add the FILE description into filelist
+    PF_FileNode filenode(fileName, PF_FileStatus(1));
+    RC rc = _pf_filelist->AppendNode(filenode);
+    return rc;
 }
 
 
@@ -52,9 +64,15 @@ RC PF_Manager::DestroyFile(const char *fileName)
         return -1;
     }
 
+    // delete the file record from pf_filelist;
+    if (_pf_filelist->DeleteNode(PF_FileNode(fileName, PF_FileStatus())) != 0){
+        Logger::Error(1, "%s is not under control\n", fileName);
+        return -1;
+    }
+
     if ( remove ( fileName ) != 0){
         perror ( "deleting error");
-        return -1;
+            return -1;
     }
     return 0;
 }
@@ -62,7 +80,13 @@ RC PF_Manager::DestroyFile(const char *fileName)
 
 RC PF_Manager::OpenFile(const char *fileName, PF_FileHandle &fileHandle)
 {
-    CHECK_NULL(fileName)
+    CHECK_NULL(fileName);
+    
+    const PF_FileNode* node = _pf_filelist->Contains(PF_FileNode(fileName, PF_FileStatus()));
+    if (node == NULL){
+        Logger::Error(1, "%s is not under control\n", fileName);
+        return -1;
+    }
 
     FILE    *fp;                    
 
@@ -72,14 +96,19 @@ RC PF_Manager::OpenFile(const char *fileName, PF_FileHandle &fileHandle)
         return -1;
     }
 
-    RC rc = fileHandle.AttachFILE(fp);
+    RC rc = fileHandle.AttachFILE(fp, node);
+    if (rc == 0){
+        node->OpenOnce();
+    }
     return rc;
 }
 
 
 RC PF_Manager::CloseFile(PF_FileHandle &fileHandle)
 {
-    FILE * fp = fileHandle.GetFILE();
+    //FILE * fp = fileHandle.GetFILE();
+    const PF_FileNode* node = NULL;
+    FILE * fp = fileHandle.GetAndResetFile(&node);
     
     CHECK_NULL(fp);
     fflush(fp);
@@ -87,11 +116,15 @@ RC PF_Manager::CloseFile(PF_FileHandle &fileHandle)
         perror( "closing error ");
         return -1;
     }
+    int opened = node->CloseOnce();
+    if (opened < 0){
+        Logger::Warn(1, "openned time less than 0!\n");
+    }
     return 0;
 }
 
-
-PF_FileHandle::PF_FileHandle(): _fp(NULL), _total_pages(0)
+////////////////////////////////////////////////////////////////
+PF_FileHandle::PF_FileHandle(): _fp(NULL),_filenode(NULL), _total_pages(0)
 {
 }
  
@@ -100,11 +133,14 @@ PF_FileHandle::~PF_FileHandle()
 {
 }
 
-FILE* PF_FileHandle::GetFILE(){
-    return _fp;
+FILE* PF_FileHandle::GetAndResetFile(const PF_FileNode ** ptr_ptr_node){
+    FILE* tfp = _fp;
+    _fp = NULL;
+    *ptr_ptr_node = _filenode;
+    return tfp;
 }
 
-RC PF_FileHandle::AttachFILE(FILE * fp){
+RC PF_FileHandle::AttachFILE(FILE * fp, const PF_FileNode* fnode){
     if ( _fp){
         fprintf(stderr, "file handle attaching error: filehandle already assigned");
         return -1;
@@ -123,6 +159,7 @@ RC PF_FileHandle::AttachFILE(FILE * fp){
     _fp = fp;
     _total_pages = file_size / PF_PAGE_SIZE;
     rewind(_fp);
+    _filenode = fnode;
     return 0;
 }
 

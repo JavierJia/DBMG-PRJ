@@ -1,3 +1,21 @@
+/*
+ * =====================================================================================
+ *
+ *       Filename:  logger.h
+ *
+ *    Description:  logger method to show different level of log/error/warn in system
+ *
+ *        Version:  1.0
+ *        Created:  10/08/2012 19:01:35
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  Jianfeng Jia (Javier), jianfeng.jia@gmail.com
+ *   Organization:  
+ *
+ * =====================================================================================
+ */
+
 #ifndef __UTIL_LOGGER_H__
 #define __UTIL_LOGGER_H__
 

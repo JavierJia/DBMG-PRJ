@@ -8,8 +8,8 @@
 #include <ctime>
 
 #include "pf.h"
-#include "../util/Logger.h"
-#include "../util/IO.h"
+#include "util/Logger.h"
+#include "util/IO.h"
 
 using namespace std;
 

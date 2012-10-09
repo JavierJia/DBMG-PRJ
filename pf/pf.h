@@ -3,8 +3,14 @@
 
 #include <cstdio>
 #include <cstdlib>
+
+#include "pf_filenode.h"
+#include "util/linked_list.h"
+
 typedef int RC;
 typedef unsigned PageNum;
+
+typedef util::LinkedList<PF_FileNode> PF_FileList;
 
 #define PF_PAGE_SIZE 4096
 
@@ -27,6 +33,7 @@ protected:
 
 private:
     static PF_Manager *_pf_manager;
+    PF_FileList *_pf_filelist;                                          // file list created by CreateFile
 };
 
 
@@ -43,10 +50,11 @@ public:
     unsigned GetNumberOfPages();                                        // Get the number of pages in the file
 
 protected:
-    RC AttachFILE (FILE * fp);                                          // Attach the opened FILE to handle
-    FILE* GetFILE ();                                                   // Give the FILE to other handler
+    RC AttachFILE (FILE * fp, const PF_FileNode * fnode);               // Attach the opened FILE to handle
+    FILE* GetAndResetFile(const PF_FileNode** );                              // Give the FILE to other handler, and nolonger attatch to that any more
 private:
     FILE    *_fp;                                                       // FILE pointer 
+    const PF_FileNode *_filenode;                                       // FILE properties 
     PageNum _total_pages;                                               // Total pages of _fp
 };
  
