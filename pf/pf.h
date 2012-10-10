@@ -5,12 +5,10 @@
 #include <cstdlib>
 
 #include "pf_filenode.h"
-#include "util/linked_list.h"
+#include "pf_filelist.h"
 
 typedef int RC;
 typedef unsigned PageNum;
-
-typedef util::LinkedList<PF_FileNode> PF_FileList;
 
 #define PF_PAGE_SIZE 4096
 
@@ -27,6 +25,8 @@ public:
     RC OpenFile      (const char *fileName, PF_FileHandle &fileHandle); // Open a file
     RC CloseFile     (PF_FileHandle &fileHandle);                       // Close a file 
 
+    RC RecoverfromLog();                                                // Recover from the log which stored the filelist 
+                                                                        //      contained all the files that created
 protected:    
     PF_Manager();                                                       // Constructor
     ~PF_Manager   ();                                                   // Destructor
@@ -34,6 +34,7 @@ protected:
 private:
     static PF_Manager *_pf_manager;
     PF_FileList *_pf_filelist;                                          // file list created by CreateFile
+    const char* _pf_log ;                        // file to store the list
 };
 
 

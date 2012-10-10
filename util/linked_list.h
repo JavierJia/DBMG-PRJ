@@ -44,7 +44,8 @@ public:
     const T* Contains (const T &data)const;     /* test if data exist in list, return pointer if exsit */
     int  DeleteNode(const T &data);             /* delete a specific data, only delete the first matched node */
     int  AppendNode(const T &data);             /* append a specific data at the end */
-private:
+protected:
+    void Delete();
     Node* head;
     Node* tail;
 };
@@ -59,13 +60,17 @@ LinkedList<T>::LinkedList(){
 
 template <class T>
 LinkedList<T>::~LinkedList(){
+    Delete();
+}
+
+template <class T>
+void LinkedList<T>::Delete(){
     while (head){
         Node* node = head;
         head = head->next;
         delete node;
     }
 }
-
 template <class T>
 bool LinkedList<T>::IsEmpty() const{
     return head == tail;

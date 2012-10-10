@@ -148,7 +148,7 @@ void test1000AppendPage()
 int main() 
 {
   cout << "##### PF Test Suite" << endl;
-  for ( int i = 0; i < 100; i++){
+  for ( int i = 0; i < 256; i++){
   testSingleton();
   testCreateFile();
   testCreateFilePreventIllegalFileName();

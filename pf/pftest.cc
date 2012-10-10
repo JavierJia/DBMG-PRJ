@@ -9,8 +9,12 @@
 
 #include "pf.h"
 #include "util/Logger.h"
-#include "util/IO.h"
+#include "util/logger.cc"
+//#include "util/io.h"
 
+namespace util{
+extern bool FileExists ( const char* fileName ) ;       /* test if file exist */
+}
 using namespace std;
 
 const int success = 0;
@@ -18,15 +22,6 @@ const int success = 0;
 clock_t clock_begin = clock();
 #define SECOND_PASSED ((float)(clock() - clock_begin) / CLOCKS_PER_SEC)
 #define	TIMELOG(p) {printf("%.3f: %s\n", (float)(clock() - clock_begin) / CLOCKS_PER_SEC, p);}
-
-// Check if a file exists
-bool FileExists(string fileName)
-{
-    struct stat stFileInfo;
-
-    if(stat(fileName.c_str(), &stFileInfo) == 0) return true;
-    else return false;
-}
 
 int TestStatInformation( const char* fileName){
 	struct stat sb;

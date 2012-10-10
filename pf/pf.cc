@@ -2,6 +2,7 @@
 #include "pf.h"
 #include "pf_filenode.h"
 #include "util/Logger.h"
+#include "util/io.h"
 
 using namespace util;
 
@@ -20,7 +21,7 @@ PF_Manager* PF_Manager::Instance()
     return _pf_manager;    
 }
 
-PF_Manager::PF_Manager()
+PF_Manager::PF_Manager():_pf_log( ".storedfilelist.dat")
 {
     _pf_filelist = new PF_FileList();
 }
@@ -51,6 +52,17 @@ RC PF_Manager::CreateFile(const char *fileName)
     // add the FILE description into filelist
     PF_FileNode filenode(fileName, PF_FileStatus(1));
     RC rc = _pf_filelist->AppendNode(filenode);
+
+    // store on disk in case of failure
+    if ( rc == 0){
+        fp = fopen( _pf_log, "wb");
+        if (!fp){
+            Logger::Warn(0, "could write on the log file:%s ", _pf_log);
+            perror("");
+        }
+        _pf_filelist->StoreInto(fp);
+        fclose(fp);
+    }
     return rc;
 }
 
@@ -74,12 +86,26 @@ RC PF_Manager::DestroyFile(const char *fileName)
         perror ( "deleting error");
             return -1;
     }
+    
+    // store on disk in case of failure
+    {
+        FILE* fp = fopen( _pf_log, "wb");
+        if (!fp){
+            Logger::Warn(0, "could write on the log file:%s ", _pf_log);
+            perror("");
+        }
+        _pf_filelist->StoreInto(fp);
+        fclose(fp);
+    }
+ 
     return 0;
 }
 
 
 RC PF_Manager::OpenFile(const char *fileName, PF_FileHandle &fileHandle)
 {
+    //TODO: check out the no. of opened files to under the limit of system ulimit
+    // http://pubs.opengroup.org/onlinepubs/7908799/xsh/getrlimit.html
     CHECK_NULL(fileName);
     
     const PF_FileNode* node = _pf_filelist->Contains(PF_FileNode(fileName, PF_FileStatus()));
@@ -121,6 +147,21 @@ RC PF_Manager::CloseFile(PF_FileHandle &fileHandle)
         Logger::Warn(1, "openned time less than 0!\n");
     }
     return 0;
+}
+
+RC PF_Manager::RecoverfromLog(){                                                // Recover from the log which stored the filelist 
+    if (!FileExists( _pf_log)){
+        Logger::Warn(1,"log file %s does not exist\n", _pf_log);
+        return -1;
+    }
+    FILE* fp = fopen( _pf_log, "rb");
+    if (!fp){
+        Logger::Error(1,"log file %s open error:", _pf_log);
+        perror("");
+        return -1;
+    }
+    fclose(fp);
+    return _pf_filelist->ReadFrom(fp);
 }
 
 ////////////////////////////////////////////////////////////////

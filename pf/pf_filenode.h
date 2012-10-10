@@ -24,7 +24,7 @@
 struct PF_FileStatus{
     int Open;
 
-    PF_FileStatus(int open=0)
+    PF_FileStatus(int open=1)
         :Open(open)
     {}
 
