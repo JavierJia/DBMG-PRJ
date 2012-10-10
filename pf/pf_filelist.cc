@@ -38,7 +38,7 @@ int PF_FileList::StoreInto(FILE* fp)const{
     t_linklist::Node* pre = head;
     t_linklist::Node* cur = pre->next;
     while(cur){
-        if ( 1 != fwrite( cur, sizeof(PF_FileNode), 1, fp)){
+        if ( 1 != fwrite( &cur->data, sizeof(PF_FileNode), 1, fp)){
             perror("pf_filelist store file error");
             return -1;
         }

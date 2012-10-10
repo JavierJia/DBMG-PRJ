@@ -8,7 +8,7 @@
 #include <ctime>
 
 #include "pf.h"
-#include "util/Logger.h"
+#include "util/logger.h"
 #include "util/logger.cc"
 //#include "util/io.h"
 
@@ -21,7 +21,8 @@ const int success = 0;
 
 clock_t clock_begin = clock();
 #define SECOND_PASSED ((float)(clock() - clock_begin) / CLOCKS_PER_SEC)
-#define	TIMELOG(p) {printf("%.3f: %s\n", (float)(clock() - clock_begin) / CLOCKS_PER_SEC, p);}
+//#define	TIMELOG(p) {printf("%.3f: %s\n", (float)(clock() - clock_begin) / CLOCKS_PER_SEC, p);}
+#define	TIMELOG(p) {}
 
 int TestStatInformation( const char* fileName){
 	struct stat sb;
@@ -232,13 +233,39 @@ int PF_FileHandle_Test_AppendPage(PF_Manager *pf){
 	return 0;
 }
 
+int PF_FileManager(PF_Manager *pf){
+    // 1. test create pf
+    const char* fname = "fname.test";
+    remove(fname);
+    RC rc;
+    rc = pf->CreateFile(fname);
+    assert( rc == success);
+	PF_FileHandle* handle = new PF_FileHandle();
+    rc = pf->OpenFile(fname, *handle);
+    assert(rc == success);
+    rc = pf->OpenFile(fname, *handle);
+    assert(rc != success);
+
+    rc = pf->CloseFile(*handle);
+    assert(rc == success);
+
+    rc = pf->OpenFile("somethingdiffernt", *handle);
+    assert(rc != success);
+
+    pf->DestroyFile(fname);
+    TIMELOG("done");
+    return 0;
+}
+
 int main()
 {
+    Logger::SetVerbosity(2);
     PF_Manager *pf = PF_Manager::Instance();
     remove("test.dat");
    
 	PF_Manager_Test_CreateFile(pf);
 	PF_Manager_Test_OpenFile(pf);
 	PF_FileHandle_Test_AppendPage(pf);
+    PF_FileManager(pf);
     return 0;
 }

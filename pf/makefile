@@ -32,3 +32,4 @@ $(CODEROOT)/util/libutil.a:
 .PHONY: clean
 clean:
 	-rm my_pftest pftest *.a *.o *~ tags .storedfilelist.dat
+	$(MAKE) -C $(CODEROOT)/util clean
