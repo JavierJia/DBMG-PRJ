@@ -8,6 +8,10 @@
 #define BLUE	"\e[34;1m"
 #define DEFAULT	"\e[0m"
 
+#ifndef TESTLOOP
+#define TESTLOOP 10
+#endif
+
 using namespace std;
 
 namespace test {
@@ -148,7 +152,7 @@ void test1000AppendPage()
 int main() 
 {
   cout << "##### PF Test Suite" << endl;
-  for ( int i = 0; i < 256; i++){
+  for ( int i = 0; i < TESTLOOP; i++){
   testSingleton();
   testCreateFile();
   testCreateFilePreventIllegalFileName();

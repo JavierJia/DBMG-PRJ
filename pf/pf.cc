@@ -1,7 +1,7 @@
 #include <sys/stat.h>
 #include "pf.h"
 #include "pf_filenode.h"
-#include "util/Logger.h"
+#include "util/logger.h"
 #include "util/io.h"
 
 using namespace util;
@@ -57,7 +57,7 @@ RC PF_Manager::CreateFile(const char *fileName)
     if ( rc == 0){
         fp = fopen( _pf_log, "wb");
         if (!fp){
-            Logger::Warn(0, "could write on the log file:%s ", _pf_log);
+            Logger::Warn(1, "could write on the log file:%s ", _pf_log);
             perror("");
         }
         _pf_filelist->StoreInto(fp);
@@ -91,7 +91,7 @@ RC PF_Manager::DestroyFile(const char *fileName)
     {
         FILE* fp = fopen( _pf_log, "wb");
         if (!fp){
-            Logger::Warn(0, "could write on the log file:%s ", _pf_log);
+            Logger::Warn(1, "could write on the log file:%s ", _pf_log);
             perror("");
         }
         _pf_filelist->StoreInto(fp);

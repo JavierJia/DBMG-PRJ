@@ -9,12 +9,8 @@
 
 #include "pf.h"
 #include "util/logger.h"
-#include "util/logger.cc"
-//#include "util/io.h"
+#include "util/io.h"
 
-namespace util{
-extern bool FileExists ( const char* fileName ) ;       /* test if file exist */
-}
 using namespace std;
 
 const int success = 0;
@@ -259,7 +255,7 @@ int PF_FileManager(PF_Manager *pf){
 
 int main()
 {
-    Logger::SetVerbosity(2);
+    util::Logger::SetVerbosity(2);
     PF_Manager *pf = PF_Manager::Instance();
     remove("test.dat");
    

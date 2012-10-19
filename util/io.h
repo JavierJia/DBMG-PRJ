@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 
 namespace util{
-bool FileExists ( const char* fileName )        /* test if file exist */
+static bool FileExists ( const char* fileName )        /* test if file exist */
 {
     struct stat stFileInfo;
     if ( stat(fileName, &stFileInfo)){
